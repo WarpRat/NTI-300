@@ -16,5 +16,5 @@ sudo systemctl start httpd
 sudo yum install -y mod_ssl
 
 #restart Apache in order to use the ssl module
-sudo systemctl restart apache
+sudo systemctl restart httpd
 
