@@ -7,4 +7,4 @@
 # │ │ │ │ │
 # │ │ │ │ │
 # * * * * *  command to execute
-*/2 * * * * /usr/bin/echo "Hello world"
+*/2 * * * * /usr/bin/logger "Hello world from the crontab! Another two minutes have gone by!"
