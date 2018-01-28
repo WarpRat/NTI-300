@@ -8,3 +8,4 @@
 # │ │ │ │ │
 # * * * * *  command to execute
 */2 * * * * /usr/bin/logger "Hello world from the crontab! Another two minutes have gone by!"
+*/1 * * * * /root/bin/du_to_html.sh
