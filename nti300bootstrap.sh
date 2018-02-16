@@ -25,8 +25,15 @@ source bin/activate
 pip install django
 django-admin startproject project1
 
-chown -R django ../
-chmod -R g=u ../
+chown -R django /opt/django/
+chmod -R g=u /opt/django/
 
+cur_ip=$(getent ahosts cloud.melanieclark.info | head -n 1 | awk '{print $1}')
+
+sed -i "s/ALLOWED_HOSTS \= \[/&'$cur_ip'/" /opt/django/project1/project1/settings.py
+
+/sbin/runuser django -s /bin/bash -c "\
+	source /opt/django/bin/activate &&
+	/opt/django/project1/manage.py runserver 0:8000"
 
 
