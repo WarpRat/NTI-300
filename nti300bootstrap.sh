@@ -33,7 +33,7 @@ passwd -e "$new_user"
 
 #
 if cd /home/"$new_user"/.ssh/ || mkdir /home/"$new_user"/.ssh && cd /home/"$new_user"/.ssh; then
-	curl "$auth_key_dir" > authorized_keys
+	curl -L "$auth_key_dir" > authorized_keys
 	chown -R "$new_user":"$new_user" /home/"$new_user"/.ssh
 	chmod 700 /home/"$new_user"/.ssh
 	chmod 600 authorized_keys
