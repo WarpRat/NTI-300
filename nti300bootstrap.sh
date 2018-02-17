@@ -40,6 +40,7 @@ else
 	echo "Error creating .ssh directory and authorized keys file for $new_user - was the user created?" |\
 	       	tee /home/$new_user/ssh_error.log |\
 	       	logger -t [NEW_USER] -p error
+fi
 
 cd /opt
 
