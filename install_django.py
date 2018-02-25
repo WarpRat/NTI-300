@@ -38,7 +38,7 @@ def install_django():
 #Start the server using the non root user.
 def start_django():
 
-    os.system('/sbin/runuser centos -s /bin/bash -c "' + \
+    os.system('sudo -u centos /bin/bash -c "' + \
              'source /opt/django/bin/activate &&' + \
              '/opt/django/project1/manage.py runserver 0:8000 &"')
 
