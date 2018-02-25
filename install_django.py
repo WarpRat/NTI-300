@@ -16,7 +16,6 @@ import os
 import fileinput
 import urllib2
 
-
 #Install updates, python3, and pip. Use pip to install virtualenv.
 def setup_install():
 
@@ -48,8 +47,8 @@ def allow_host():
     for line in fileinput.input('/opt/django/project1/project1/settings.py', inplace=1):
 
         if "ALLOWED_HOST" in line:
-            line = "ALLOWED_HOST = [\"" + ip + "\"]"
-    print line
+            line = "ALLOWED_HOST = ['" + ip + "']"
+        print line
 
         
 #Start the server using the non root user.
@@ -59,12 +58,11 @@ def start_django():
              'source /opt/django/bin/activate &&' + \
              '/opt/django/project1/manage.py runserver 0:8000 &"')
 
-#Call all the functions in order.
+#Call all the functions in order if the python script is being run directly and not loaded as a module.
 
-setup_install()
-
-install_django()
-
-allow_host()
-
-start_django()
+if __name__ == "__main__":
+    
+    setup_install()
+    install_django()
+    allow_host()
+    start_django()
