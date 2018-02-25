@@ -11,8 +11,11 @@
 ########################
 
 
-#Import the os module to allow the python script to issue commands
+#Import the os module to allow the python script to issue commands, fileinput to modify the settings file, and urllib2 to get public ip.
 import os
+import fileinput
+import urllib2
+
 
 #Install updates, python3, and pip. Use pip to install virtualenv.
 def setup_install():
@@ -22,6 +25,7 @@ def setup_install():
     os.system('yum install -y python34 python-pip')
     os.system('pip install --upgrade pip')
     os.system('pip install virtualenv')
+
 
 #Make the directory structure for the django server using the virtualenv and install django using pip.
 def install_django():
@@ -35,6 +39,19 @@ def install_django():
               '&& django-admin startproject project1')
     os.system('chown -R centos /opt/django')
 
+
+#Get public IP and insert it into the settings.py file.
+def allow_host():
+
+    ip = urllib2.urlopen('http://169.254.169.254/latest/meta-data/public-ipv4').read()
+
+    for line in fileinput.input('/opt/django/project1/project1/settings.py', inplace=1):
+
+        if "ALLOWED_HOST" in line:
+            line = "ALLOWED_HOST = [\" + ip + "\"]"
+    print line
+
+        
 #Start the server using the non root user.
 def start_django():
 
@@ -42,13 +59,12 @@ def start_django():
              'source /opt/django/bin/activate &&' + \
              '/opt/django/project1/manage.py runserver 0:8000 &"')
 
-#Call all three functions in order.
+#Call all the functions in order.
 
-#print('***************Setting up the install**********************') #Testing
 setup_install()
 
-#print('******************Installing Django************************') #Testing
 install_django()
 
-#print('****************Starting the server****************************') #Testing
+allow_host()
+
 start_django()
