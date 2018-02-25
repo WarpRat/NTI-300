@@ -46,8 +46,8 @@ def allow_host():
 
     for line in fileinput.input('/opt/django/project1/project1/settings.py', inplace=1):
 
-        if "ALLOWED_HOST" in line:
-            line = "ALLOWED_HOST = ['" + ip + "']"
+        if "ALLOWED_HOSTS" in line:
+            line = "ALLOWED_HOSTS = ['" + ip + "']"
         print line
 
         
