@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 #################
 ##
@@ -25,7 +25,7 @@ client = boto3.client('ec2')  #Create a shortcut variable for the boto3 ec2 clie
 
 amazon_image = 'ami-392ba941'   #Will install the CentOS AMI I created based on the official CentOS cloud image with updated storage. 
 amazon_instance = 't2.micro'    #Instance size                                  
-amazon_pem_key = 'django_dev.pem' #My private key. Actually created months ago last time I was playing with django.
+amazon_pem_key = 'django_dev' #My private key. Actually created months ago last time I was playing with django.
 firewall_profiles = ['launch-wizard-4']   #The security group I've been using with the following ports open: 22,80,443,8000.
 
 
