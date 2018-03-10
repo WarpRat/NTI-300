@@ -29,7 +29,7 @@ amazon_image = 'ami-392ba941'   #Will install the CentOS AMI I created based on 
 amazon_instance = 't2.micro'    #Instance size                                  
 amazon_pem_key = 'django_dev' #My private key. Actually created months ago last time I was playing with django.
 firewall_profiles = ['launch-wizard-4']   #The security group I've been using with the following ports open: 22,80,443,8000.
-slack_webhook = 'https://hooks.slack.com/services/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'
+slack_webhook = 'hooks.slack.com'
 
 #Print the current variables to confirm to the user that they are correct or to be logged for troubleshooting.
 '''
@@ -40,15 +40,22 @@ print(amazon_pem_key)
 #Define a module to launch instances.
 
 ec2_data = {}
-slack_payload = {"payload" : ec2_data}
 ec2_data['AMI'] = amazon_image
 ec2_data['Instance Type'] = amazon_instance
-ec2_data['Security Group'] = firewall_profiles
+for i in firewall_profiles:
+  ec2_data['Security Group ' + str(firewall_profiles.index(i) + 1)] = i
+slack_payload = {"text" : json.dumps(ec2_data, indent=3, separators=(',',': '))}
+
 slack_json = json.dumps(slack_payload)
 
 conn = httplib.HTTPSConnection(slack_webhook)
+headers = {"Content-type": "application/json"}
+conn.request("POST", "/services/T2A60EGCV/B9MSF08UA/30AjuNdmHeQwQnASu5ZwNGI2", slack_json, headers)
 
-conn.request("PUT", "/", slack_json)
+response = conn.getresponse()
+pprint.pprint(response.read())
+pprint.pprint(slack_json)
+pprint.pprint(slack_payload)
 
 def launch_test_instance():
 
