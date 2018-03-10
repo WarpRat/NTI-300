@@ -46,10 +46,10 @@ def launch_test_instance():
       MaxCount=1,                      #Autoscaling options.
       KeyName = amazon_pem_key,        #Name of the keypair you want to use to authenticate.
       SecurityGroupIds = firewall_profiles,   #Name of the security group to attach.
-      UserData="#!/bin/bash\ 
-      curl https://raw.githubusercontent.com/WarpRat/NTI-300/master/install_django.py > /tmp/bootstrap_django.py\ 
-      chmod +x /tmp/bootstrap_django.py\ 
-      /tmp/bootstrap_django.py"
+      UserData="""#!/bin/bash
+      curl https://raw.githubusercontent.com/WarpRat/NTI-300/master/install_django.py > /tmp/bootstrap_django.py
+      chmod +x /tmp/bootstrap_django.py
+      /tmp/bootstrap_django.py"""
     )
 
    pprint.pprint(instances)   #This will print the response returned from boto3 command.
