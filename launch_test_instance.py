@@ -14,6 +14,8 @@
 import boto3   #Imports the python module that can be used to control AWS resources
 import base64  #Used to convert strings to and from base64 encoding. I don't actually see it used here however. Could be used to convert userdata to a base64 string.
 import pprint  #Python's pretty print module. Easy way to display API responses and other things in human readable form.
+import httplib #For posting logs and status to slack
+import json  #To create slack log objects
 
 #Creating variables to make using the boto3 module easier. A more readable option than importing python modules using the form `from boto3 import resource as br`.
 
@@ -27,15 +29,26 @@ amazon_image = 'ami-392ba941'   #Will install the CentOS AMI I created based on 
 amazon_instance = 't2.micro'    #Instance size                                  
 amazon_pem_key = 'django_dev' #My private key. Actually created months ago last time I was playing with django.
 firewall_profiles = ['launch-wizard-4']   #The security group I've been using with the following ports open: 22,80,443,8000.
-
+slack_webhook = 'https://hooks.slack.com/services/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'
 
 #Print the current variables to confirm to the user that they are correct or to be logged for troubleshooting.
-
+'''
 print(amazon_image)
 print(amazon_instance)
 print(amazon_pem_key)
-
+'''
 #Define a module to launch instances.
+
+ec2_data = {}
+slack_payload = {"payload" : ec2_data}
+ec2_data['AMI'] = amazon_image
+ec2_data['Instance Type'] = amazon_instance
+ec2_data['Security Group'] = firewall_profiles
+slack_json = json.dumps(slack_payload)
+
+conn = httplib.HTTPSConnection(slack_webhook)
+
+conn.request("PUT", "/", slack_json)
 
 def launch_test_instance():
 
