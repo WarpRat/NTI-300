@@ -15,7 +15,10 @@ import boto3   #Imports the python module that can be used to control AWS resour
 import base64  #Used to convert strings to and from base64 encoding. I don't actually see it used here however. Could be used to convert userdata to a base64 string.
 import pprint  #Python's pretty print module. Easy way to display API responses and other things in human readable form.
 import httplib #For posting logs and status to slack
-import json  #To create slack log objects
+import json    #To create slack log objects
+import os      #To get user data
+from datetime import datetime  #For logging
+
 
 #Creating variables to make using the boto3 module easier. A more readable option than importing python modules using the form `from boto3 import resource as br`.
 
@@ -31,33 +34,53 @@ amazon_pem_key = 'django_dev' #My private key. Actually created months ago last 
 firewall_profiles = ['launch-wizard-4']   #The security group I've been using with the following ports open: 22,80,443,8000.
 slack_webhook = 'hooks.slack.com'
 
-#Print the current variables to confirm to the user that they are correct or to be logged for troubleshooting.
+#Print the current variables to confirm to the user that they are correct or to be logged for troubleshooting. 
+#(Currently commented out due to slack integration)
 '''
 print(amazon_image)
 print(amazon_instance)
 print(amazon_pem_key)
 '''
-#Define a module to launch instances.
 
 ec2_data = {}
 ec2_data['AMI'] = amazon_image
 ec2_data['Instance Type'] = amazon_instance
 for i in firewall_profiles:
   ec2_data['Security Group ' + str(firewall_profiles.index(i) + 1)] = i
-slack_payload = {"text" : json.dumps(ec2_data, indent=3, separators=(',',': '))}
 
-slack_json = json.dumps(slack_payload)
+#slack_payload = {"text" : json.dumps(ec2_data, indent=3, separators=(',',': '))}
+#slack_json = json.dumps(slack_payload)
 
-conn = httplib.HTTPSConnection(slack_webhook)
-headers = {"Content-type": "application/json"}
-conn.request("POST", "/services/T2A60EGCV/B9MSF08UA/30AjuNdmHeQwQnASu5ZwNGI2", slack_json, headers)
+def write_to_slack(body):
+    body_json = json.dumps({"text" : body})
+    conn = httplib.HTTPSConnection(slack_webhook)
+    headers = {"Content-type": "application/json"}
+    conn.request("POST", "/services/T2A60EGCV/B9MSF08UA/30AjuNdmHeQwQnASu5ZwNGI2", body_json, headers)
+    response = conn.getresponse()
 
-response = conn.getresponse()
-pprint.pprint(response.read())
-pprint.pprint(slack_json)
-pprint.pprint(slack_payload)
+     #Debugging
+    pprint.pprint(response.read())
+    #pprint.pprint(slack_json)
+    #pprint.pprint(slack_payload)
+    
+
+
+#Define a module to launch instances.
 
 def launch_test_instance():
+   
+   cur_time = datetime.now().strftime('%I:%M:%S %p')
+   cur_date = datetime.now().strftime('%D')
+   cur_user = os.system('whoami')
+   cur_host = os.system('hostname')
+   body = "At *%s* on *%s* \n\nThe following user triggered the EC2 launch script for the Django test server\nUser: *%s*\nHost: *%s*" % (cur_time, cur_date, cur_user, cur_host)
+   write_to_slack(body)
+
+
+   body = "The details of instace are:"
+   for i in ec2_data: 
+      body = body + "\n*%s:* %s" % (i, ec2_data[i])
+   write_to_slack(body)
 
    instances = ec2.create_instances(   #Create a variable that stores the response to creating the instance with the previous boto3 shortcut variable.
       ImageId = amazon_image,          #References the image from above.
