@@ -77,7 +77,7 @@ def launch_test_instance():
     write_to_slack(body)
 
 
-    body = "The details of instace are:"
+    body = "The details of instance are:"
     for i in ec2_data:
         body = body + "\n*%s:* %s" % (i, ec2_data[i])
     write_to_slack(body)
@@ -127,8 +127,9 @@ def check_django(pub_ip, tries):
             body = 'Good news, it looks like %s is up ' % pub_ip
             body += '\nStatus: *%s*\nReason: *%s*' % (str(res.status), str(res.reason))
             write_to_slack(body)
-            tries = 0
-            break
+            #tries = 0
+            #break
+            sys.exit('Success!')
         except httplib.HTTPException as res:
             body = "Not ready yet: " + str(res)
             body += "\nWaiting for 90 seconds"
@@ -136,9 +137,10 @@ def check_django(pub_ip, tries):
             time.sleep(90)
             tries -= 1
             check_django(pub_ip, tries)
-        except:
+        except Exception as e:
             body = "%s never connected. Check the logs maybe? Security groups? VPC nacls?" % pub_ip
             print(body)
+            print(e)
             write_to_slack(body)
             sys.exit('Never connected')
 
@@ -165,7 +167,8 @@ def do_check(conn):
             print(body)
             sys.exit("ohnooooo!")
 
-    except:
+    except Exception as e:
+        print(e)
         print('Uncaught exception here - failed during connectivity test')
         sys.exit('Uncaught exception. Failed during connectivity test')
 
