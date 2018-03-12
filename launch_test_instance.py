@@ -111,30 +111,36 @@ def launch_test_instance():
 
     write_to_slack(body)
 
+    body = "Checking to see if the django server has come up yet. First we'll give it a little while for the scripts to run then attempt to connect 3 times"
+    write_to_slack(body)
+
+    time.sleep(30)
+
+    check_django(pub_ip, 3)
 
 def check_django(pub_ip, tries):
 
-    body = "Checking to see if the django server has come up yet. First we'll give it a little while for the scripts to run then attempt to connect 3 times"
-    write_to_slack(body)
-    time.sleep(30)
     conn = httplib.HTTPConnection(pub_ip, 8000, timeout=10)
     while tries > 0:
         try:
             res = do_check(conn)
-            body = 'Good news, it looks like %s is up' % pub_ip
+            body = 'Good news, it looks like %s is up ' % pub_ip
             body += res.status
             body += res.reason
             write_to_slack(body)
             break
         except httplib.HTTPException as res:
-            body = "Not ready yet: " + res
-            body += "\nWaiting for 30 seconds"
-            time.sleep(30)
+            body = "Not ready yet: " + str(res)
+            body += "\nWaiting for 90 seconds"
+            write_to_slack(body)
+            time.sleep(90)
             tries -= 1
             check_django(pub_ip, tries)
         except:
-            print('Uncaught exception here - failed during connectivity test')
-            sys.exit('Uncaught exception. Failed during connectivity test')
+            body = "%s never connected. Check the logs maybe? Security groups? VPC nacls?"
+            print(body)
+            write_to_slack(body)
+            sys.exit('Never connected')
 
 
 def do_check(conn):
