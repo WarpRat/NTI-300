@@ -114,7 +114,7 @@ def launch_test_instance():
     body = "Checking to see if the django server has come up yet. First we'll give it a little while for the scripts to run then attempt to connect 3 times"
     write_to_slack(body)
 
-    time.sleep(30)
+    time.sleep(180)
 
     check_django(pub_ip, 3)
 
@@ -125,9 +125,9 @@ def check_django(pub_ip, tries):
         try:
             res = do_check(conn)
             body = 'Good news, it looks like %s is up ' % pub_ip
-            body += res.status
-            body += res.reason
+            body += '\nStatus: *%s*\nReason: *%s*' % (str(res.status), str(res.reason))
             write_to_slack(body)
+            tries = 0
             break
         except httplib.HTTPException as res:
             body = "Not ready yet: " + str(res)
@@ -137,7 +137,7 @@ def check_django(pub_ip, tries):
             tries -= 1
             check_django(pub_ip, tries)
         except:
-            body = "%s never connected. Check the logs maybe? Security groups? VPC nacls?"
+            body = "%s never connected. Check the logs maybe? Security groups? VPC nacls?" % pub_ip
             print(body)
             write_to_slack(body)
             sys.exit('Never connected')
